@@ -1,0 +1,17 @@
+version: "3"
+services:
+  redis:
+    image: redis:3.2-alpine
+    ports:
+      - "6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - ./data:/data
+  app:
+    image: node:8
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./app:/app
+    depends_on:
+      - redis
