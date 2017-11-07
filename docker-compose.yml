@@ -15,3 +15,4 @@ services:
       - ./app:/app
     depends_on:
       - redis
+    command: npm start --prefix ./app/
