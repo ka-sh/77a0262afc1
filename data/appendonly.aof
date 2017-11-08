@@ -23,3 +23,64 @@ $4
 incr
 $4
 test
+*2
+$6
+SELECT
+$1
+0
+*3
+$3
+set
+$36
+206e8028-3e6b-4e32-8638-7ef4e08a2418
+$15
+[object Object]
+*3
+$3
+set
+$36
+2ee680a6-723a-4d77-98da-b645c831f4bb
+$15
+[object Object]
+*3
+$3
+set
+$36
+035deabc-264a-419d-bc43-d5fb230438cd
+$15
+[object Object]
+*3
+$3
+set
+$36
+58ae6cd8-d37b-4b78-a5e4-74fff7cb9558
+$15
+[object Object]
+*3
+$3
+set
+$36
+1f41b4e0-4ddf-4723-86c4-5d30b73520d8
+$15
+[object Object]
+*3
+$3
+set
+$36
+cae957d3-fcf3-4ec1-b0aa-9cde0e8d579b
+$24
+{"status":"in progress"}
+*3
+$3
+set
+$36
+e6221a76-2513-4170-86ab-add59667d1dd
+$24
+{"status":"in progress"}
+*3
+$3
+set
+$36
+8f5d5bf7-4ea4-4ff2-adfd-6d2aa9a4bc2d
+$24
+{"status":"in progress"}
