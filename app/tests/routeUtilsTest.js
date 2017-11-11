@@ -32,9 +32,13 @@ describe('Testing route service ', function() {
         const routeService = require('../services/routeUtils')(mockRedisService, fakeApiCli);
         let p = routeService.getShortestRoute(token, INPUT)
             .then(function(result) {
-                console.log(`\n\n\n\n${result}\n\n\n\n`);
+                let solution = mockRedisService.updateToken.getCall(0)
+                    .args[1];
+                assert('success', solution.status);
+                assert(11268, solution.total_distance);
+                assert('[[22.271829,114.16307],[22.265556,114.163442],[22.267377,114.151866]]', JSON.stringify(solution.path))
                 done();
             })
+            .catch(done);
     });
-
 });
