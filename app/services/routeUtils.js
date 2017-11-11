@@ -142,7 +142,7 @@ module.exports = function(redisService, apiCli) {
                         logger.error(`Failure during processing request token ${token}: ${err}`)
                         redisClient.updateToken(token, {
                             status: 'failure',
-                            error: "reason"
+                            error: JSON.stringify(err)
                         });
                         reject(err);
                     });
