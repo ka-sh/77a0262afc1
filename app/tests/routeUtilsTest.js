@@ -4,6 +4,7 @@
 const assert = require('assert');
 const sinon = require('sinon');
 const Promise = require('bluebird');
+
 const fs = require('fs');
 const INPUT = destinations = [
     [22.275820, 114.155968],
@@ -14,7 +15,7 @@ const INPUT = destinations = [
 
 
 describe('Testing route service ', function() {
-    it('should pass in rosy scenario', function() {
+    it('should pass in rosy scenario', function(done) {
         let token = "Test Token";
         let fakeApiCli = {
             distanceMatrix: function() {
@@ -28,9 +29,12 @@ describe('Testing route service ', function() {
         let stubUpdateToken = sinon.stub(mockRedisService, 'updateToken')
             .usingPromise(Promise)
             .resolves("mock success");
-        mockRedisService.mockedT = true;
         const routeService = require('../services/routeUtils')(mockRedisService, fakeApiCli);
-        routeService.getShortestRoute(token, INPUT);
+        let p = routeService.getShortestRoute(token, INPUT)
+            .then(function(result) {
+                console.log(`\n\n\n\n${result}\n\n\n\n`);
+                done();
+            })
     });
 
 });

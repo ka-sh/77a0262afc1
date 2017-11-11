@@ -1,14 +1,15 @@
 const Promise = require('bluebird');
 const orTools = require('node_or_tools');
-
-
+const logger = require('winston');
 
 /**
  * Convert destination array passed by user to
  * Google API desintation object
+ *@param {Array[][]} 2D Array contains destinations passed by user
  * @return Array of objects {lat,lan}
  */
 function toGoogleDestObj(destinations) {
+    logger.info(`Transforming user destination object ${JSON.stringify(destinations)}`);
     const lat = 0;
     const lan = 1;
     let destObj = [];
@@ -33,6 +34,7 @@ function checkForUnfound(res) {
  * Build Cost matrix for OR API
  */
 function buildCostMatrix(rows) {
+    logger.info(`Building cost matrix for ${JSON.stringify(rows)}`);
     let distanceCost = [];
     let timeCost = [];
     for (let i = 0; i < rows.length; i++) {
@@ -53,9 +55,11 @@ function buildCostMatrix(rows) {
 }
 
 /**
- * Calculate shortest path
+ * User google-OR lib to solve shortest path based on the cost matrix provided
+ * @param costObj {Array[][]} 2D matrix contianing route cost between all nodes
  */
-function calculateShortestRoute(costObj) {
+function findShortestRoute(costObj) {
+    logger.info(`Calculating short route for cost matrix: ${JSON.stringify(costObj)}`);
     const tspSolveOpt = {
         numNodes: costObj.distance.length,
         costs: costObj.distance
@@ -74,7 +78,12 @@ function calculateShortestRoute(costObj) {
             });
     });
 }
-
+/**
+ * Calculate shortest route distance, duration based on the route recommended
+ * @param route {Array} indicating indices of nodes forming shortest route
+ * @param costMatrix {Array[][]} 2D Array contianing costMatrix between all nodes
+ * @param coordinate{Array[][]} 2D Array containing original coordinate sent by user
+ */
 function calculateRouteCost(route, costMatrix, coordinate) {
     let tmpTotalDistance = 0;
     let tmpTotalTime = 0;
@@ -92,45 +101,52 @@ function calculateRouteCost(route, costMatrix, coordinate) {
     };
 }
 
+
 module.exports = function(redisService, apiCli) {
+    /**
+     * User google distance matrix API to calculate distances between nodes
+     * @param destinations {Array[][]} coordinates provided by user
+     *@return Promise {Object} containing distance matrix between coordinates
+     */
+    function getDistanceBetweenNodes(destinations) {
+        let locations = toGoogleDestObj(destinations);
+        return apiCli.distanceMatrix({
+                origins: locations,
+                destinations: locations,
+            })
+            .asPromise()
+    }
+
     return {
         /**
          * Calculate shortest route and save it to redis
+         * @param token {String} key that will be used to update redis entry
+         * @param destinations {Array[][]} 2D array containing user coordinates
          */
         getShortestRoute: function(token, destinations) {
-            // console.log("=>>>>Test");
-            let locations = toGoogleDestObj(destinations);
-            apiCli.distanceMatrix({
-                    origins: locations,
-                    destinations: locations,
-                })
-                .asPromise()
-                .then(function(results) {
-                    //TODO:Check for not found locations
-                    //TODO:Build cost matrix
-                    let costObj = buildCostMatrix(results.json.rows);
-                    console.log(costObj);
-
-                    //TODO:calculate shortest route
-                    calculateShortestRoute(costObj)
-                        .then(function(result) {
-                            console.log(result);
-                            let cost = calculateRouteCost(result, costObj, destinations);
-                            console.log(cost);
-                            redisService.updateToken(token, cost)
-                                .then(function(data) {
-                                    console.log("success/", data);
-                                }, function(err) {
-                                    console.error(err);
-                                });
-                        }, function(err) {
-                            console.error(err);
+            return new Promise(function(resolve, reject) {
+                getDistanceBetweenNodes(destinations)
+                    .then(function(distanceMatrixApiRes) {
+                        let costObj = buildCostMatrix(distanceMatrixApiRes.json.rows);
+                        return Promise.all([costObj, findShortestRoute(costObj)]);
+                    })
+                    .then(function(results) {
+                        let cost = calculateRouteCost(results[1], results[0], destinations);
+                        return redisService.updateToken(token, cost)
+                    })
+                    .then(function(updateResult) {
+                        logger.info(`Token request ${token} has been processed successfully.`)
+                        resolve(updateResult);
+                    })
+                    .catch(function(err) {
+                        logger.error(`Failure during processing request token ${token}: ${err}`)
+                        redisClient.updateToken(token, {
+                            status: 'failure',
+                            error: "reason"
                         });
-                    //TODO:Update redis
-                }, function(reason) {
-                    //TODO:Handle connection or any api-call related errors
-                    console.error(reason);
-                });
+                        reject(err);
+                    });
+            });
         }
     }
 }
