@@ -16,6 +16,11 @@
     "node_or_tools": "^1.0.5",
     "nodemon": "^1.12.1",
     "redis": "^2.8.0",
-    "uuid": "^3.1.0"
+    "uuid": "^3.1.0",
+    "winston": "^2.4.0"
+  },
+  "devDependencies": {
+    "mocha": "^4.0.1",
+    "sinon": "^4.1.2"
   }
 }
