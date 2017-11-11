@@ -20,30 +20,26 @@ app.get('/route/:token', function(req, res) {
 });
 
 app.get('/', function(req, res) {
-    let key = "Test token";
     let validation = validateAndParseInput(req.query.destinations);
     if (validation.valid) {
-        routeUtils.getShortestRoute(key, validation.array)
-        res.send({
-            token: key
-        });
+        redisService.generateToken()
+            .then(function(token) {
+                res.send({
+                    token: token
+                });
+                return routeUtils.getShortestRoute(token, validation.array)
+            })
+            .then(function(results) {
+                console.log("Request processed successfully");
+            })
+            .catch(function(err) {
+                console.error('failed to process request ', err);
+            });
     } else {
         res.send({
             error: validation.err
         });
     }
-    // routeUtils.getShortestRoute(key, destinations);
-    // redis.generateToken()
-    //     .then((token) => {
-    //         key = token;
-    //         res.send(token);
-    //     }, (err) => {
-    //         console.error("Error while generating token", err);
-    //     });
-    //TODO:Build cost matrix
-    //TODO:Calculate shortest route
-    //TODO:update results in redis
-    // res.send(req.query.destinations)
 });
 
 /**
