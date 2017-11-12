@@ -6,6 +6,7 @@ const redisService = require('./services/redisService')(clientFactory.getRedisCl
 const routeUtils = require('./services/routeUtils')(redisService, clientFactory.getGoogleApiCli());
 const bodyParser = require('body-parser');
 const validator = require('./utils/validator');
+const logger = require('winston');
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({
     extended: false
@@ -14,28 +15,45 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.get('/route/:token', function(req, res) {
+
     //TODO:validate token string
-    redisService.getToken(req.params.token)
-        .then(function(result) {
-            if (result !== null) {
-                res.send(result);
-            } else {
-                res.send({
-                    error: "Token doesn't exist."
-                });
-            }
-        })
-        .catch(function(err) {
-            res.send({
-                error: 'Failed to fetch token'
+    if (validator.isValidToken(req.params.token)) {
+        logger.info(`Received token request for ${req.params.token}`);
+        redisService.getToken(req.params.token)
+            .then(function(result) {
+                if (result !== null) {
+                    res.status(200)
+                        .send(result);
+                } else {
+                    logger.warn('Token request for invalid token');
+                    res.send({
+                        error: "Token doesn't exist."
+                    });
+                }
+            })
+            .catch(function(err) {
+                logger.error(err);
+                res.status(400)
+                    .send({
+                        error: 'Failed to fetch token'
+                    });
             });
-        });
+    } else {
+        logger.warn(`Invalid token request for ${req.params.token}`)
+        res.status(400)
+            .send({
+                status: 'failure',
+                error: 'Invalid token'
+            });
+    }
+
 });
 
 app.post('/', function(req, res) {
     let destMatrix;
     try {
         destMatrix = validator.isValidInput(req.body.destinations);
+        logger.info(`request to calculate shortest path for ${destMatrix}`);
         redisService.generateToken()
             .then(function(token) {
                 res.status(200)
@@ -47,6 +65,7 @@ app.post('/', function(req, res) {
         //TODO:token should be updated here in case of success/failure
         //need to extract logic to this location
     } catch (ex) {
+        logger.error(ex);
         res.status(400)
             .send({
                 status: 'failure',
@@ -54,30 +73,6 @@ app.post('/', function(req, res) {
             });
     }
 });
-
-// app.get('/', function(req, res) {
-//     let validation = validateAndParseInput(req.query.destinations);
-//     if (validation.valid) {
-//         redisService.generateToken()
-//             .then(function(token) {
-//                 res.send({
-//                     token: token
-//                 });
-//                 return routeUtils.getShortestRoute(token, validation.array)
-//             })
-//             .then(function(results) {
-//                 console.log("Request processed successfully");
-//             })
-//             .catch(function(err) {
-//                 console.error('failed to process request ', err);
-//             });
-//     } else {
-//         res.send({
-//             error: validation.err
-//         });
-//     }
-// });
-//
 
 app.listen(8080, function() {
     console.log('App is running');
