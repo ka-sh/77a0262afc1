@@ -14,6 +14,15 @@ To calculate the shortest route I am using the following :
  - Generate cost matrix based on the distance.
  - Use node_or_tools to calculate shortest path, as far as I understand main method used to solve the problem is via constraint programming.
  - Once shortest path is found, we use the original cost matrix to calculate total distance, traveling time.
+   ### Architecture
+                              __________________________________
+                             |___________LOAD BALANCER__________|
+
+                                |             |              |
+                             |APP_1|       |APP_2|        |APP_3|
+                                  |           |             |
+                                 __________________________
+                                |___________Redis__________|
 
  ### Docker & scaling
 
@@ -21,10 +30,11 @@ To calculate the shortest route I am using the following :
  to use nginx-proxy as a dynamic load-balancer.
 
  In a ideal scenario we can do the following:
-
+```
  docker-compose up
- docker-compose scale app=4
 
+ docker-compose scale app=4
+```
  nginx-proxy will take care of the load-balancing for us without much configurations.
 
  **Note: since we are using nginx-proxy, all request going to the api need to have customized header with {Host:app.local}**
@@ -37,7 +47,7 @@ To calculate the shortest route I am using the following :
 
  ### To request shortest route
 
- [Post /]
+ [Post http://localhost/]
 
  ```
  body{
@@ -47,5 +57,4 @@ To calculate the shortest route I am using the following :
 
  ### To check token status
 
- [GET /route/:Token]
- 
+ [GET http://localhost/route/:Token]
