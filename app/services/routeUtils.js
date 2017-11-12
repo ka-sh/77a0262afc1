@@ -42,7 +42,7 @@ function buildCostMatrix(rows) {
         let tmpDistanceCost = [];
         let tmpDurationCost = [];
         for (let j = 0; j < elemArr.length; j++) {
-            if (elemArr[j].status !== 'success') {
+            if (elemArr[j].status !== 'OK') {
                 throw new Error(`Invalid coordinate location, please check provided coordinate`);
             }
             tmpDistanceCost.push(elemArr[j].distance.value);
