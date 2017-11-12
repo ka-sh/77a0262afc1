@@ -269,3 +269,64 @@ $36
 b0172b13-a928-42ba-b043-61d42855a502
 $99
 {"status":"failure","error":"Error: Invalid coordinate location, please check provided coordinate"}
+*3
+$3
+set
+$36
+cca21510-6883-4e57-bb82-af28c73b42ea
+$24
+{"status":"in progress"}
+*3
+$3
+set
+$36
+cca21510-6883-4e57-bb82-af28c73b42ea
+$99
+{"status":"failure","error":"Error: Invalid coordinate location, please check provided coordinate"}
+*3
+$3
+set
+$36
+ad37f5a4-2bcd-4234-8d9d-46e05f689a92
+$24
+{"status":"in progress"}
+*3
+$3
+set
+$36
+ad37f5a4-2bcd-4234-8d9d-46e05f689a92
+$99
+{"status":"failure","error":"Error: Invalid coordinate location, please check provided coordinate"}
+*3
+$3
+set
+$36
+c204231b-e575-4df3-b765-fa213027313c
+$24
+{"status":"in progress"}
+*3
+$3
+set
+$36
+c204231b-e575-4df3-b765-fa213027313c
+$160
+{"status":"success","total_distance":11268,"total_time":1602,"path":[[22.27582,114.155968],[22.271829,114.16307],[22.265556,114.163442],[22.267377,114.151866]]}
+*2
+$6
+SELECT
+$1
+0
+*3
+$3
+set
+$36
+ecf110aa-3049-4910-9d5d-7a626545d2ac
+$24
+{"status":"in progress"}
+*3
+$3
+set
+$36
+ecf110aa-3049-4910-9d5d-7a626545d2ac
+$160
+{"status":"success","total_distance":11268,"total_time":1602,"path":[[22.27582,114.155968],[22.271829,114.16307],[22.265556,114.163442],[22.267377,114.151866]]}

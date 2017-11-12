@@ -8,11 +8,8 @@ services:
     volumes:
       - ./data:/data
   app:
-    image: node:8
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./app:/app
+    build: ./app/
     depends_on:
       - redis
-    command: npm start --prefix ./app/
+    expose:
+      - "8080"
