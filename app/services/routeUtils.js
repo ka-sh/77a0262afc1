@@ -11,12 +11,12 @@ const logger = require('winston');
 function toGoogleDestObj(destinations) {
     logger.info(`Transforming user destination object ${JSON.stringify(destinations)}`);
     const lat = 0;
-    const lan = 1;
+    const lng = 1;
     let destObj = [];
     for (let i = 0; i < destinations.length; i++) {
         destObj.push({
             lat: destinations[i][lat],
-            lng: destinations[i][lan]
+            lng: destinations[i][lng]
         });
     }
     return destObj;
@@ -42,6 +42,9 @@ function buildCostMatrix(rows) {
         let tmpDistanceCost = [];
         let tmpDurationCost = [];
         for (let j = 0; j < elemArr.length; j++) {
+            if (elemArr[j].status !== 'success') {
+                throw new Error(`Invalid coordinate location, please check provided coordinate`);
+            }
             tmpDistanceCost.push(elemArr[j].distance.value);
             tmpDurationCost.push(elemArr[j].duration.value);
         }
@@ -87,7 +90,7 @@ function findShortestRoute(costObj) {
 function calculateRouteCost(route, costMatrix, coordinate) {
     let tmpTotalDistance = 0;
     let tmpTotalTime = 0;
-    let path = [];
+    let path = [coordinate[0]];
     for (let i = 0; i < route.length; i++) {
         tmpTotalTime += parseFloat(costMatrix.time[route[i]]);
         tmpTotalDistance += parseFloat(costMatrix.distance[route[i]]);
@@ -140,9 +143,9 @@ module.exports = function(redisService, apiCli) {
                     })
                     .catch(function(err) {
                         logger.error(`Failure during processing request token ${token}: ${err}`)
-                        redisClient.updateToken(token, {
+                        redisService.updateToken(token, {
                             status: 'failure',
-                            error: JSON.stringify(err)
+                            error: err.toString()
                         });
                         reject(err);
                     });
