@@ -14,6 +14,15 @@ To calculate the shortest route I am using the following :
  - Generate cost matrix based on the distance.
  - Use node_or_tools to calculate shortest path, as far as I understand main method used to solve the problem is via constraint programming.
  - Once shortest path is found, we use the original cost matrix to calculate total distance, traveling time.
+ ### Architecture
+                              __________________________________
+                             |___________LOAD BALANCER__________|
+
+                                |             |              |
+                             |APP_1|       |APP_2|        |APP_3|
+                                  |           |             |
+                                 __________________________
+                                |___________Redis__________|
 
  ### Docker & scaling
 
