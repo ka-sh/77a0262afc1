@@ -37,7 +37,7 @@ To calculate the shortest route I am using the following :
 
  ### To request shortest route
 
- [Post /]
+ [Post http://localhost/]
 
  ```
  body{
@@ -47,4 +47,4 @@ To calculate the shortest route I am using the following :
 
  ### To check token status
 
- [GET /route/:Token]
+ [GET http://localhost/route/:Token]
