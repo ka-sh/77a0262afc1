@@ -16,9 +16,16 @@ app.get('/route/:token', function(req, res) {
                     error: "Token doesn't exist."
                 });
             }
+        })
+        .catch(function(err) {
+            res.send({
+                error: 'Failed to fetch token'
+            });
         });
 });
+app.post('/', function(req, res) {
 
+})
 app.get('/', function(req, res) {
     let validation = validateAndParseInput(req.query.destinations);
     if (validation.valid) {
@@ -41,61 +48,6 @@ app.get('/', function(req, res) {
         });
     }
 });
-
-/**
- *  Validate and parse the input
- *  Return validation object
- * @return {valid:Boolean, err:String, array:Array}
- */
-function validateAndParseInput(input) {
-    let array = [];
-    let result = {
-        valid: false,
-        err: null,
-        array: undefined
-    };
-    /**
-     * Max size is 1024
-     */
-    if (input.length > 1024) {
-        result.err = "Input length exceeds Max";
-        return result;
-    }
-    /**
-     * Invalid input string
-     */
-    try {
-        array = JSON.parse(input);
-        if (!Array.isArray(array)) {
-            throw new Error('Not an Array');
-        }
-    } catch (ex) {
-        result.err = "Invalid input";
-        return result;
-    }
-    /**
-     * Invalid coordinate value
-     */
-    for (let i = 0; i < array.length; i++) {
-        try {
-            array[i] = [parseFloat(array[i][0]), parseFloat(array[i][1])];
-
-            if (isNaN(array[i][0]) || isNaN(array[i][1])) {
-                result.err = 'invalid coordinate value';
-                return result;
-            }
-        } catch (ex) {
-            result.err = 'invalid coordinate value';
-            return result;
-        }
-
-    }
-
-    return {
-        valid: true,
-        array: array
-    }
-}
 
 
 app.listen(8080, function() {
